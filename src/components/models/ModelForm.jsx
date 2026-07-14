@@ -1,3 +1,5 @@
+
+
 // import { useForm } from 'react-hook-form'
 // import Input from '../common/Input'
 // import Select from '../common/Select'
@@ -5,36 +7,44 @@
 
 // export default function ModelForm({ initialData, brands, onSubmit, onCancel }) {
 //   const { register, handleSubmit, formState: { errors } } = useForm({
-//     defaultValues: initialData ?? { name: '', brand: '', year: new Date().getFullYear(), status: 'active' },
+//     defaultValues: {
+//       modelName: initialData?.modelName ?? '',   // ← 'name' → 'modelName'
+//       brandId: initialData?.brandId ?? '',       // ← 'brand' → 'brandId'
+//     },
 //   })
 
 //   return (
 //     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-//       <Input label="Model Name" error={errors.name?.message} {...register('name', { required: 'Required' })} />
+//       <Input
+//         label="Model Name"
+//         error={errors.modelName?.message}
+//         {...register('modelName', { required: 'Model name is required' })}
+//       />
 //       <Select
 //         label="Brand"
-//         options={brands.map((b) => ({ value: b.name, label: b.name }))}
-//         error={errors.brand?.message}
-//         {...register('brand', { required: 'Required' })}
+//         options={brands.map((b) => ({
+//           value: String(b.brandId),    // ← b.name → b.brandId
+//           label: b.brandName,          // ← b.name → b.brandName
+//         }))}
+//         error={errors.brandId?.message}
+//         {...register('brandId', { required: 'Brand is required' })}
 //       />
-//       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-//         <Input label="Year" type="number" {...register('year')} />
-//         <Select
-//           label="Status"
-//           options={[
-//             { value: 'active', label: 'Active' },
-//             { value: 'inactive', label: 'Inactive' },
-//           ]}
-//           {...register('status')}
-//         />
-//       </div>
+//       {/* year + status la tirtirray — backend ma u baahna */}
+
 //       <div className="flex justify-end gap-3 pt-2">
-//         <Button variant="outline" type="button" onClick={onCancel}>Cancel</Button>
-//         <Button type="submit">{initialData ? 'Update' : 'Add Model'}</Button>
+//         <Button variant="outline" type="button" onClick={onCancel}>
+//           Cancel
+//         </Button>
+//         <Button type="submit">
+//           {initialData ? 'Update' : 'Add Model'}
+//         </Button>
 //       </div>
 //     </form>
 //   )
 // }
+
+
+//this backend of java(spring boot)
 
 import { useForm } from 'react-hook-form'
 import Input from '../common/Input'
@@ -44,8 +54,10 @@ import Button from '../common/Button'
 export default function ModelForm({ initialData, brands, onSubmit, onCancel }) {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      modelName: initialData?.modelName ?? '',   // ← 'name' → 'modelName'
-      brandId: initialData?.brandId ?? '',       // ← 'brand' → 'brandId'
+      modelName: initialData?.modelName ?? '',
+      brandId: initialData?.brand?.id
+        ? String(initialData.brand.id)
+        : '',
     },
   })
 
@@ -59,13 +71,12 @@ export default function ModelForm({ initialData, brands, onSubmit, onCancel }) {
       <Select
         label="Brand"
         options={brands.map((b) => ({
-          value: String(b.brandId),    // ← b.name → b.brandId
-          label: b.brandName,          // ← b.name → b.brandName
+          value: String(b.id),
+          label: b.brandName,
         }))}
         error={errors.brandId?.message}
         {...register('brandId', { required: 'Brand is required' })}
       />
-      {/* year + status la tirtirray — backend ma u baahna */}
 
       <div className="flex justify-end gap-3 pt-2">
         <Button variant="outline" type="button" onClick={onCancel}>

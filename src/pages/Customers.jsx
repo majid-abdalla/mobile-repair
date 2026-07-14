@@ -1,4 +1,5 @@
-// import { useState } from 'react'
+
+// import { useState, useEffect } from 'react'
 // import { IoAdd } from 'react-icons/io5'
 // import Header from '../components/layout/Header'
 // import Card from '../components/common/Card'
@@ -11,10 +12,16 @@
 // import CustomerForm from '../components/customers/CustomerForm'
 // import usePagination from '../hooks/usePagination'
 // import useDebounce from '../hooks/useDebounce'
-// import { customers as initialCustomers } from '../data/mockData'
+// import {
+//   getCustomers,
+//   createCustomer,
+//   updateCustomer,
+//   deactivateCustomer,
+// } from '../service/customerService'
 
 // export default function Customers() {
-//   const [items, setItems] = useState(initialCustomers)
+//   const [items, setItems] = useState([])
+//   const [loading, setLoading] = useState(true)
 //   const [search, setSearch] = useState('')
 //   const [statusFilter, setStatusFilter] = useState('')
 //   const [modalOpen, setModalOpen] = useState(false)
@@ -22,34 +29,73 @@
 //   const [editing, setEditing] = useState(null)
 //   const [deleting, setDeleting] = useState(null)
 
+//   // Backend ka soo qaad
+//   useEffect(() => {
+//     const fetchCustomers = async () => {
+//       try {
+//         const res = await getCustomers({ pageNumber: 1, pageSize: 100 })
+//         setItems(res.data.items ?? [])
+//       } catch (err) {
+//         console.error('Failed to fetch customers:', err)
+//       } finally {
+//         setLoading(false)
+//       }
+//     }
+//     fetchCustomers()
+//   }, [])
+
 //   const debouncedSearch = useDebounce(search)
 //   const { data, currentPage, totalPages, goToPage, resetPage } = usePagination(items, {
-//     pageSize: 5,
-//     searchFields: ['name', 'email', 'phone'],
+//     pageSize: 10,
+//     searchFields: ['fullName', 'email', 'phone'],  // ← 'name' → 'fullName'
 //     searchQuery: debouncedSearch,
-//     filterFn: statusFilter ? (item) => item.status === statusFilter : null,
+//     filterFn: statusFilter
+//       ? (item) => (statusFilter === 'active' ? item.isActive : !item.isActive)
+//       : null,
 //   })
 
 //   const handleSearch = (val) => { setSearch(val); resetPage() }
 //   const handleFilter = (val) => { setStatusFilter(val); resetPage() }
-
 //   const openAdd = () => { setEditing(null); setModalOpen(true) }
 //   const openEdit = (row) => { setEditing(row); setModalOpen(true) }
 //   const openDelete = (row) => { setDeleting(row); setDeleteModal(true) }
 
-//   const handleSubmit = (formData) => {
-//     if (editing) {
-//       setItems((prev) => prev.map((i) => (i.id === editing.id ? { ...i, ...formData } : i)))
-//     } else {
-//       setItems((prev) => [...prev, { ...formData, id: Date.now(), repairs: 0, joined: new Date().toISOString().split('T')[0] }])
+//   // Backend ku kaydso
+//   const handleSubmit = async (formData) => {
+//     try {
+//       if (editing) {
+//         await updateCustomer(editing.customerId, formData)
+//         setItems((prev) =>
+//           prev.map((i) => (i.customerId === editing.customerId ? { ...i, ...formData } : i))
+//         )
+//       } else {
+//         const res = await createCustomer(formData)
+//         setItems((prev) => [...prev, res.data])
+//       }
+//       setModalOpen(false)
+//     } catch (err) {
+//       console.error('Failed to save customer:', err)
 //     }
-//     setModalOpen(false)
 //   }
 
-//   const confirmDelete = () => {
-//     setItems((prev) => prev.filter((i) => i.id !== deleting.id))
-//     setDeleteModal(false)
-//     setDeleting(null)
+//   // Soft delete
+//   const confirmDelete = async () => {
+//     try {
+//       await deactivateCustomer(deleting.customerId)
+//       setItems((prev) => prev.filter((i) => i.customerId !== deleting.customerId))
+//       setDeleteModal(false)
+//       setDeleting(null)
+//     } catch (err) {
+//       console.error('Failed to deactivate customer:', err)
+//     }
+//   }
+
+//   if (loading) {
+//     return (
+//       <div className="flex min-h-96 items-center justify-center">
+//         <p className="text-slate-500">Loading customers...</p>
+//       </div>
+//     )
 //   }
 
 //   return (
@@ -64,7 +110,12 @@
 //       <Card padding="none">
 //         <div className="space-y-4 p-4 sm:p-6">
 //           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-//             <SearchBar value={search} onChange={handleSearch} placeholder="Search customers..." className="flex-1" />
+//             <SearchBar
+//               value={search}
+//               onChange={handleSearch}
+//               placeholder="Search customers..."
+//               className="flex-1"
+//             />
 //             <Select
 //               value={statusFilter}
 //               onChange={handleFilter}
@@ -77,33 +128,53 @@
 //             />
 //           </div>
 //           <CustomerTable data={data} onEdit={openEdit} onDelete={openDelete} />
-//           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={goToPage} />
+//           <Pagination
+//             currentPage={currentPage}
+//             totalPages={totalPages}
+//             onPageChange={goToPage}
+//           />
 //         </div>
 //       </Card>
 
-//       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Customer' : 'Add Customer'} size="md">
-//         <CustomerForm initialData={editing} onSubmit={handleSubmit} onCancel={() => setModalOpen(false)} />
+//       <Modal
+//         open={modalOpen}
+//         onClose={() => setModalOpen(false)}
+//         title={editing ? 'Edit Customer' : 'Add Customer'}
+//         size="md"
+//       >
+//         <CustomerForm
+//           initialData={editing}
+//           onSubmit={handleSubmit}
+//           onCancel={() => setModalOpen(false)}
+//         />
 //       </Modal>
 
 //       <Modal
 //         open={deleteModal}
 //         onClose={() => setDeleteModal(false)}
-//         title="Delete Customer"
+//         title="Deactivate Customer"
 //         footer={
 //           <>
-//             <Button variant="outline" onClick={() => setDeleteModal(false)}>Cancel</Button>
-//             <Button variant="danger" onClick={confirmDelete}>Delete</Button>
+//             <Button variant="outline" onClick={() => setDeleteModal(false)}>
+//               Cancel
+//             </Button>
+//             <Button variant="danger" onClick={confirmDelete}>
+//               Deactivate
+//             </Button>
 //           </>
 //         }
 //       >
 //         <p className="text-sm text-slate-600">
-//           Are you sure you want to delete <strong>{deleting?.name}</strong>? This action cannot be undone.
+//           Are you sure you want to deactivate{' '}
+//           <strong>{deleting?.fullName}</strong>?{/* ← name → fullName */}
 //         </p>
 //       </Modal>
 //     </div>
 //   )
 // }
 
+
+///this backend of java(spring boot)
 
 import { useState, useEffect } from 'react'
 import { IoAdd } from 'react-icons/io5'
@@ -135,12 +206,11 @@ export default function Customers() {
   const [editing, setEditing] = useState(null)
   const [deleting, setDeleting] = useState(null)
 
-  // Backend ka soo qaad
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await getCustomers({ pageNumber: 1, pageSize: 100 })
-        setItems(res.data.items ?? [])
+        const res = await getCustomers()
+        setItems(res.data ?? [])
       } catch (err) {
         console.error('Failed to fetch customers:', err)
       } finally {
@@ -153,7 +223,7 @@ export default function Customers() {
   const debouncedSearch = useDebounce(search)
   const { data, currentPage, totalPages, goToPage, resetPage } = usePagination(items, {
     pageSize: 10,
-    searchFields: ['fullName', 'email', 'phone'],  // ← 'name' → 'fullName'
+    searchFields: ['fullName', 'email', 'phone'],
     searchQuery: debouncedSearch,
     filterFn: statusFilter
       ? (item) => (statusFilter === 'active' ? item.isActive : !item.isActive)
@@ -166,13 +236,12 @@ export default function Customers() {
   const openEdit = (row) => { setEditing(row); setModalOpen(true) }
   const openDelete = (row) => { setDeleting(row); setDeleteModal(true) }
 
-  // Backend ku kaydso
   const handleSubmit = async (formData) => {
     try {
       if (editing) {
-        await updateCustomer(editing.customerId, formData)
+        await updateCustomer(editing.id, formData)
         setItems((prev) =>
-          prev.map((i) => (i.customerId === editing.customerId ? { ...i, ...formData } : i))
+          prev.map((i) => (i.id === editing.id ? { ...i, ...formData } : i))
         )
       } else {
         const res = await createCustomer(formData)
@@ -184,11 +253,12 @@ export default function Customers() {
     }
   }
 
-  // Soft delete
   const confirmDelete = async () => {
     try {
-      await deactivateCustomer(deleting.customerId)
-      setItems((prev) => prev.filter((i) => i.customerId !== deleting.customerId))
+      await deactivateCustomer(deleting.id)
+      setItems((prev) =>
+        prev.map((i) => (i.id === deleting.id ? { ...i, isActive: false } : i))
+      )
       setDeleteModal(false)
       setDeleting(null)
     } catch (err) {
@@ -272,7 +342,7 @@ export default function Customers() {
       >
         <p className="text-sm text-slate-600">
           Are you sure you want to deactivate{' '}
-          <strong>{deleting?.fullName}</strong>?{/* ← name → fullName */}
+          <strong>{deleting?.fullName}</strong>?
         </p>
       </Modal>
     </div>
