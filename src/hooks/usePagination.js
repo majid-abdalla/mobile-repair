@@ -5,19 +5,28 @@ export default function usePagination(items, options = {}) {
     pageSize = 10,
     searchFields = [],
     searchQuery = '',
+    filterFn = null,
   } = typeof options === 'number' ? { pageSize: options } : options
 
   const [currentPage, setCurrentPage] = useState(1)
 
   const filteredItems = useMemo(() => {
-    if (!searchQuery || searchFields.length === 0) return items
+    let result = items
 
-    return items.filter((item) =>
-      searchFields.some((field) =>
-        String(item[field]).toLowerCase().includes(searchQuery.toLowerCase())
+    if (searchQuery && searchFields.length > 0) {
+      result = result.filter((item) =>
+        searchFields.some((field) =>
+          String(item[field]).toLowerCase().includes(searchQuery.toLowerCase())
+        )
       )
-    )
-  }, [items, searchQuery, searchFields])
+    }
+
+    if (typeof filterFn === 'function') {
+      result = result.filter(filterFn)
+    }
+
+    return result
+  }, [items, searchQuery, searchFields, filterFn]) // ← filterFn wali jiraa
 
   const paginationData = useMemo(() => {
     const totalPages = Math.ceil(filteredItems.length / pageSize)
@@ -29,7 +38,7 @@ export default function usePagination(items, options = {}) {
       currentPage,
       totalPages,
       currentItems,
-      data: currentItems,  // Alias for compatibility
+      data: currentItems,
       startIndex: startIndex + 1,
       endIndex: Math.min(endIndex, filteredItems.length),
       total: filteredItems.length,

@@ -12,13 +12,14 @@ export default function RepairFilters({ search, onSearchChange, statusFilter, on
       />
       <Select
         value={statusFilter}
-        onChange={onStatusChange}
+        onChange={(e) => onStatusChange(e.target.value)}  // ← e.target.value
         placeholder="All Statuses"
         options={[
-          { value: 'pending', label: 'Pending' },
-          { value: 'in-progress', label: 'In Progress' },
-          { value: 'completed', label: 'Completed' },
-          { value: 'cancelled', label: 'Cancelled' },
+          { value: 'Received', label: 'Received' },
+          { value: 'InProgress', label: 'In Progress' },
+          { value: 'Completed', label: 'Completed' },
+          { value: 'Delivered', label: 'Delivered' },
+          { value: 'Cancelled', label: 'Cancelled' },
         ]}
         className="w-full sm:w-48"
       />

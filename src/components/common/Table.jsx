@@ -1,10 +1,24 @@
-export default function Table({ columns, data, renderCell, emptyMessage = 'No data found', className = '' }) {
+export default function Table({ 
+  columns, 
+  data, 
+  renderCell, 
+  emptyMessage = 'No data found', 
+  className = '',
+  rowKey = null  // ← CUSUB: custom key
+}) {
   if (!data?.length) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <p className="text-sm text-slate-500">{emptyMessage}</p>
       </div>
     )
+  }
+
+  const getRowKey = (row, index) => {
+    if (rowKey) return row[rowKey]
+    // Auto-detect common ID fields
+    return row.repairId ?? row.customerId ?? row.paymentId ?? 
+           row.brandId ?? row.modelId ?? row.userId ?? row.id ?? index
   }
 
   return (
@@ -24,7 +38,10 @@ export default function Table({ columns, data, renderCell, emptyMessage = 'No da
         </thead>
         <tbody className="divide-y divide-slate-50">
           {data.map((row, rowIndex) => (
-            <tr key={row.id ?? rowIndex} className="transition-colors hover:bg-surface-muted/50">
+            <tr
+              key={getRowKey(row, rowIndex)}
+              className="transition-colors hover:bg-surface-muted/50"
+            >
               {columns.map((col) => (
                 <td key={col.key} className="whitespace-nowrap px-4 py-3.5 text-slate-700">
                   {renderCell ? renderCell(row, col.key) : row[col.key]}

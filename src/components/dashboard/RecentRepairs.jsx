@@ -1,30 +1,4 @@
-// import Card from '../common/Card'
-// import Table from '../common/Table'
-// import StatusBadge from '../common/StatusBadge'
 
-// const columns = [
-//   { key: 'id', label: 'ID' },
-//   { key: 'customer', label: 'Customer' },
-//   { key: 'device', label: 'Device' },
-//   { key: 'status', label: 'Status' },
-//   { key: 'cost', label: 'Cost' },
-// ]
-
-// export default function RecentRepairs({ data }) {
-//   return (
-//     <Card title="Recent Repairs" subtitle="Latest repair orders">
-//       <Table
-//         columns={columns}
-//         data={data}
-//         renderCell={(row, key) => {
-//           if (key === 'status') return <StatusBadge status={row.status} />
-//           if (key === 'cost') return `$${row.cost}`
-//           return row[key]
-//         }}
-//       />
-//     </Card>
-//   )
-// }
 
 import Card from '../common/Card'
 import Table from '../common/Table'
