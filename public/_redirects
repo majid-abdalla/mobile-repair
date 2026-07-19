@@ -1,0 +1,2 @@
+/api/*  http://mobile-repair-backend.somee.com/api/:splat  200
+/*      /index.html                                         200
