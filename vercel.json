@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/backend/:path*",
-      "destination": "http://mobile-repair-backend.somee.com/api/:path*"
+      "source": "/api/:path*",
+      "destination": "/api/[...slug]"
     },
     {
       "source": "/(.*)",
