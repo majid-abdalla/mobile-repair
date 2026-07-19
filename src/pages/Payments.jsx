@@ -14,7 +14,7 @@ import useDebounce from '../hooks/useDebounce'
 import {
   getPayments,
   createPayment,
-} from '../Service/paymentService'
+} from '../service/paymentService'
 
 export default function Payments() {
   const [items, setItems] = useState([])

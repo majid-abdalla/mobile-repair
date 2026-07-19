@@ -16,7 +16,7 @@ import {
   createCustomer,
   updateCustomer,
   deleteCustomer,
-} from '../Service/customerService'
+} from '../service/customerService'
 
 export default function Customers() {
   const [items, setItems] = useState([])

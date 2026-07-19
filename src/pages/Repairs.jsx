@@ -16,7 +16,7 @@ import {
   updateRepairStatus,
   updateRepairCosts,
   cancelRepair,
-} from '../Service/repairService'
+} from '../service/repairService'
 
 export default function Repairs() {
   const [items, setItems] = useState([])
