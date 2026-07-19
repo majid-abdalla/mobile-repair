@@ -104,7 +104,7 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Profile */}
+        {}
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => {
@@ -114,10 +114,10 @@ export default function Navbar() {
             className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-surface-subtle"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-sm font-semibold text-white">
-              {user?.fullName?.charAt(0) ?? '?'}  {/* ← fullName, safe */}
+              {user?.fullName?.charAt(0) ?? '?'}  {/*fullName*/}
             </div>
             <span className="hidden text-sm font-medium text-slate-700 md:block">
-              {user?.fullName ?? 'User'}          {/* ← fullName, safe */}
+              {user?.fullName ?? 'User'}          {/* ← fullName*/}
             </span>
           </button>
           {showProfile && (
