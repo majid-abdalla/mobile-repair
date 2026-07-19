@@ -18,8 +18,16 @@ export default async function handler(req, res) {
     }
 
     const backendRes = await fetch(targetUrl, options);
-    const data = await backendRes.json();
-    res.status(backendRes.status).json(data);
+    
+    const text = await backendRes.text();
+    
+    try {
+      const json = JSON.parse(text);
+      res.status(backendRes.status).json(json);
+    } catch {
+      res.status(backendRes.status).send(text);
+    }
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
